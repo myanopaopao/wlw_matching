@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="jp">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-9">
+          <button class="btn btn-primary" id="make_matching">マッチング</button>
+          <div class="form-check">
+            <label class="form-check-label">
+              <input id="cast_unique" type="checkbox" class="form-check-input">
+              キャスト被り無し
+            </label>
+          </div>
+        </div>
+        <div class="col-3">
+          <button class="btn btn-primary" id="post_matching">LINEに投稿</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th colspan=2>チームA</th>
+                <th colspan=2>チームB</th>
+                <th>リザーバー</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <tr>
+                  <td id="player_a0"></td>
+                  <td id="cast_a0"></td>
+                  <td id="player_b0"></td>
+                  <td id="cast_b0"></td>
+                  <td id="reserver0"></td>
+                </tr>
+                <td id="player_a1"></td>
+                <td id="cast_a1"></td>
+                <td id="player_b1"></td>
+                <td id="cast_b1"></td>
+                <td id="reserver1"></td>
+              </tr>
+              <tr>
+                <td id="player_a2"></td>
+                <td id="cast_a2"></td>
+                <td id="player_b2"></td>
+                <td id="cast_b2"></td>
+                <td id="reserver2"></td>
+              </tr>
+              <tr>
+                <td id="player_a3"></td>
+                <td id="cast_a3"></td>
+                <td id="player_b3"></td>
+                <td id="cast_b3"></td>
+                <td id="reserver3"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="form-group">
+            <textarea class="form-control" rows="12" id="player_list"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script>
+      Array.prototype.shuffle = function() {
+        for(var i = this.length - 1; i > 0; i--){
+            var r = Math.floor(Math.random() * (i + 1));
+            var tmp = this[i];
+            this[i] = this[r];
+            this[r] = tmp;
+        }
+      };
+      Array.prototype.getRandom = function(uniqueFlag) {
+        var index = Math.floor(Math.random() * this.length);
+        var result = this[index];
+        if (uniqueFlag) {
+          this.splice(index, 1);
+        }
+        return result;
+      };
+      $(function(){
+        $("#make_matching").on("click", function(){
+          var castList = [
+            ["サンド","吉備津","大聖","アイアン・フック","メロウ","シャドウ・アリス","リン","ツクヨミ","ジーン","温羅","ドルミール","マグス・クラウン","シュネーヴィッツェン"],
+            ["美猴","アシェンプテル","闇吉備津","ナイトメア・キッド","ミクサ","リトル・アリス","デス・フック","スカーレット","怪童丸","ロビン・シャーウッド","深雪乃"],
+            ["ピーター・ザ・キッド","シレネッタ","かぐや","メイド・マリアン","ヴァイス","エピーヌ"]
+          ];
+          var str = $("#player_list").val();
+          str = str.replace( /\r\n/g , "\n" );
+          str = str.replace( /^(\n+)|(\n+)$/g , "" );
+
+          var playerList = str.split( /\n/g );
+          playerList.shuffle();
+
+          var uniqueFlag = $("#cast_unique").prop("checked");
+
+          for (var i = 0; i <= 3; i++) {
+            $("#player_a" + i).text(playerList[i]);
+            $("#player_b" + i).text(playerList[i + 4]);
+            var role = Math.floor(Math.random() * 4);
+            if (role === 3) {
+              role = 0;
+            }
+            if (castList[role].length < 2){
+              role = Math.floor(Math.random() * 2);
+            }
+            $("#cast_a" + i).text(castList[role].getRandom(uniqueFlag));
+            $("#cast_b" + i).text(castList[role].getRandom(uniqueFlag));
+          }
+          for (var i = 0, max = playerList.length; i + 8 <= max; i++) {
+            $("#reserver" + i).text(playerList[i + 8]);
+          }
+        });
+        $("#post_matching").on("click", function(){
+
+        });
+      });
+    </script>
+  </body>
+</html>
