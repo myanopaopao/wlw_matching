@@ -11,7 +11,7 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-9">
+        <div class="col-12">
           <button class="btn btn-primary" id="make_matching">マッチング</button>
           <div class="form-check">
             <label class="form-check-label">
@@ -20,7 +20,9 @@
             </label>
           </div>
         </div>
-        <div class="col-3">
+      </div>
+      <div class="row">
+        <div class="col-12">
           <a role="button" href="#" class="btn btn-primary" id="post_matching">LINEに投稿</a>
         </div>
       </div>
@@ -167,8 +169,8 @@
             }
             var castA = castList[role].getRandom(uniqueFlag);
             var castB = castList[role].getRandom(uniqueFlag);
-            msgA = msgA + castA + "\n";
-            msgB = msgB + castB + "\n";
+            msgA = msgA + playerList[i] + "\n" + castA + "\n";
+            msgB = msgB + playerList[i + 4] + "\n"  + castB + "\n";
 
             $("#cast_a" + i).text(castA);
             $("#cast_b" + i).text(castB);
@@ -178,7 +180,7 @@
 
           for (var i = 0, max = playerList.length; i + 8 < max; i++) {
             $("#reserver" + i).text(playerList[i + 8]);
-            msg = msg + playerList[i + 8];
+            msg = msg + (i + 1) + "：" +  playerList[i + 8] + "\n";
           }
 
           $("#post_matching").attr("href", "http://line.me/R/msg/text/?" + encodeURIComponent(msg));
