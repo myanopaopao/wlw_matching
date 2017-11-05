@@ -181,7 +181,7 @@
             msg = msg + playerList[i + 8];
           }
 
-          $("#post_matching").attr("href", encodeURIComponent("http://line.me/R/msg/text/?" + msg));
+          $("#post_matching").attr("href", "http://line.me/R/msg/text/?" + encodeURIComponent(msg));
         });
       });
     </script>
