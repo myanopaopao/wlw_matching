@@ -12,11 +12,24 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
+            <h2>wlwフレマのマッチング</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
           <button class="btn btn-primary" id="make_matching">マッチング</button>
           <div class="form-check">
             <label class="form-check-label">
               <input id="cast_unique" type="checkbox" class="form-check-input">
               キャスト被り無し
+            </label>
+            <label class="form-check-label">
+              <input id="only_role" type="checkbox" class="form-check-input">
+              ロールのみ指定
+            </label>
+            <label class="form-check-label">
+              <input id="one_team" type="checkbox" class="form-check-input">
+              １チームのみ
             </label>
           </div>
         </div>
@@ -54,7 +67,7 @@
               </tr>
             </tbody>
           </table>
-          <table class="table table-bordered table-striped">
+          <table id="team_b" class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th colspan=2>チームB</th>
@@ -145,6 +158,10 @@
             ["美猴","アシェンプテル","闇吉備津","ナイトメア・キッド","ミクサ","リトル・アリス","デス・フック","スカーレット","怪童丸","ロビン・シャーウッド","深雪乃"],
             ["ピーター・ザ・キッド","シレネッタ","かぐや","メイド・マリアン","ヴァイス","エピーヌ"]
           ];
+          var roleList = [
+            "ファイター", "アタッカー", "サポーター"
+          ];
+
           var str = $("#player_list").val();
           str = str.replace( /\r\n/g , "\n" );
           str = str.replace( /^(\n+)|(\n+)$/g , "" );
@@ -153,6 +170,8 @@
           playerList.shuffle();
 
           var uniqueFlag = $("#cast_unique").prop("checked");
+          var onlyRoleFlag = $("#only_role").prop("checked");
+          var oneTeamFlag = $("#one_team").prop("checked");
 
           var msgA = "チームA\n";
           var msgB = "チームB\n";
@@ -167,8 +186,13 @@
             if (castList[role].length < 2){
               role = Math.floor(Math.random() * 2);
             }
-            var castA = castList[role].getRandom(uniqueFlag);
-            var castB = castList[role].getRandom(uniqueFlag);
+            if (onlyRoleFlag) {
+              var castA = roleList[role];
+              var castB = roleList[role];
+            } else {
+              var castA = castList[role].getRandom(uniqueFlag);
+              var castB = castList[role].getRandom(uniqueFlag);
+            }
             msgA = msgA + playerList[i] + "\n" + castA + "\n";
             msgB = msgB + playerList[i + 4] + "\n"  + castB + "\n";
 
@@ -176,14 +200,32 @@
             $("#cast_b" + i).text(castB);
           }
 
-          var msg = msgA + "\n" + msgB + "\nリザーバー\n";
+          if (oneTeamFlag) {
+            var msg = msgA + "\nリザーバー\n";
+            var playerNum = 4;
+          } else {
+            var msg = msgA + "\n" + msgB + "\nリザーバー\n";
+            var playerNum = 8;
+          }
 
-          for (var i = 0, max = playerList.length; i + 8 < max; i++) {
-            $("#reserver" + i).text(playerList[i + 8]);
-            msg = msg + (i + 1) + "：" +  playerList[i + 8] + "\n";
+          for (var i = 0; i <= 3; i++) {
+            if (i + playerNum < playerList.length) {
+              $("#reserver" + i).text(playerList[i + playerNum]);
+              msg = msg + (i + 1) + "：" +  playerList[i + playerNum] + "\n";
+            } else {
+              $("#reserver" + i).text("");
+            }
           }
 
           $("#post_matching").attr("href", "http://line.me/R/msg/text/?" + encodeURIComponent(msg));
+        });
+
+        $("#one_team").change(function(){
+          if ($(this).prop("checked")){
+            $("#team_b").hide();
+          } else{
+            $("#team_b").show();
+          }
         });
       });
     </script>
