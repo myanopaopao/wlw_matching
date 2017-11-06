@@ -1,11 +1,20 @@
 <!doctype html>
 <html lang="jp">
   <head>
-    <title>wlwマッチング</title>
+    <title>wlwフレマのマッチング</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <style>
+      #post_matching{
+        display: none;
+      }
+      #team_a, #team_b, #reserver{
+        table-layout: fixed;
+        display: none;
+      }
+    </style>
   </head>
 
   <body>
@@ -34,14 +43,16 @@
           </div>
         </div>
       </div>
-      <div class="row">
+      <div id="post_matching" class="row">
         <div class="col-12">
-          <a role="button" href="#" class="btn btn-primary" id="post_matching">LINEに投稿</a>
+          <a role="button" href="#" class="btn btn-primary" id="post_twitter" target="_blank">Twitterに投稿</a>
+          <a role="button" href="#" class="btn btn-primary" id="post_line" target="_blank">LINEに投稿</a>
         </div>
       </div>
+      <hr>
       <div class="row">
         <div class="col-12">
-          <table class="table table-bordered table-striped">
+          <table id="team_a" class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th colspan=2>チームA</th>
@@ -50,7 +61,7 @@
             <tbody>
               <tr>
                 <tr>
-                  <td id="player_a0"></td>
+                  <td  id="player_a0"></td>
                   <td id="cast_a0"></td>
                 </tr>
                 <tr>
@@ -93,7 +104,7 @@
               </tr>
             </tbody>
           </table>
-          <table class="table table-bordered table-striped">
+          <table id="reserver" class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th colspan=2>リザーバー</th>
@@ -119,6 +130,11 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <button class="btn btn-primary" id="load_prev">前回のプレイヤーを読み込む</button>
         </div>
       </div>
       <div class="row">
@@ -166,12 +182,31 @@
           str = str.replace( /\r\n/g , "\n" );
           str = str.replace( /^(\n+)|(\n+)$/g , "" );
 
+          if (!str) {
+            return;
+          }
+
           var playerList = str.split( /\n/g );
           playerList.shuffle();
 
           var uniqueFlag = $("#cast_unique").prop("checked");
           var onlyRoleFlag = $("#only_role").prop("checked");
           var oneTeamFlag = $("#one_team").prop("checked");
+
+          $("#post_matching").show();
+          $("#team_a").show();
+          if (oneTeamFlag) {
+            $("#team_b").hide();
+            var playerNum = 4;
+          } else {
+            $("#team_b").show();
+            var playerNum = 8;
+          }
+          if (playerList.length < playerNum) {
+            $("#reserver").hide();
+          } else {
+            $("#reserver").show();
+          }
 
           var msgA = "チームA\n";
           var msgB = "チームB\n";
@@ -202,10 +237,8 @@
 
           if (oneTeamFlag) {
             var msg = msgA + "\nリザーバー\n";
-            var playerNum = 4;
           } else {
             var msg = msgA + "\n" + msgB + "\nリザーバー\n";
-            var playerNum = 8;
           }
 
           for (var i = 0; i <= 3; i++) {
@@ -217,15 +250,14 @@
             }
           }
 
-          $("#post_matching").attr("href", "http://line.me/R/msg/text/?" + encodeURIComponent(msg));
-        });
+          window.localStorage.setItem("playerList", str);
 
-        $("#one_team").change(function(){
-          if ($(this).prop("checked")){
-            $("#team_b").hide();
-          } else{
-            $("#team_b").show();
-          }
+          $("#post_twitter").attr("href", "http://twitter.com/share?text=" + encodeURIComponent(msg));
+          $("#post_line").attr("href", "http://line.me/R/msg/text/?" + encodeURIComponent(msg));
+        });
+        $("#load_prev").on("click", function(){
+          var str = window.localStorage.getItem("playerList") || "";
+          $("#player_list").val(str);
         });
       });
     </script>
