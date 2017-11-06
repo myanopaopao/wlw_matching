@@ -4,7 +4,6 @@
     <title>wlwフレマのマッチング</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <style>
       #post_matching{
@@ -146,7 +145,6 @@
         </div>
       </div>
     </div>
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
@@ -158,17 +156,22 @@
             this[i] = this[r];
             this[r] = tmp;
         }
+        return this;
       };
-      Array.prototype.getRandom = function(uniqueFlag) {
+      Array.prototype.getRandom = function() {
+        return this[Math.floor(Math.random() * this.length)];
+      };
+      Array.prototype.spliceRandom = function() {
         var index = Math.floor(Math.random() * this.length);
         var result = this[index];
-        if (uniqueFlag) {
-          this.splice(index, 1);
-        }
+        this.splice(index, 1);
         return result;
       };
       $(function(){
         $("#make_matching").on("click", function(){
+          var roleBalance = [
+            0,0,0,0,1,1,1,2,2
+          ];
           var castList = [
             ["サンド","吉備津","大聖","アイアン・フック","メロウ","シャドウ・アリス","リン","ツクヨミ","ジーン","温羅","ドルミール","マグス・クラウン","シュネーヴィッツェン"],
             ["美猴","アシェンプテル","闇吉備津","ナイトメア・キッド","ミクサ","リトル・アリス","デス・フック","スカーレット","怪童丸","ロビン・シャーウッド","深雪乃"],
@@ -214,19 +217,21 @@
           for (var i = 0; i <= 3; i++) {
             $("#player_a" + i).text(playerList[i]);
             $("#player_b" + i).text(playerList[i + 4]);
-            var role = Math.floor(Math.random() * 4);
-            if (role === 3) {
-              role = 0;
-            }
+            var role = roleBalance.getRandom();
             if (castList[role].length < 2){
-              role = Math.floor(Math.random() * 2);
+              role = 1;
             }
             if (onlyRoleFlag) {
               var castA = roleList[role];
               var castB = roleList[role];
             } else {
-              var castA = castList[role].getRandom(uniqueFlag);
-              var castB = castList[role].getRandom(uniqueFlag);
+              if (uniqueFlag) {
+                var castA = castList[role].spliceRandom();
+                var castB = castList[role].spliceRandom();
+              } else {
+                var castA = castList[role].getRandom();
+                var castB = castList[role].getRandom();
+              }
             }
             msgA = msgA + playerList[i] + "\n" + castA + "\n";
             msgB = msgB + playerList[i + 4] + "\n"  + castB + "\n";
